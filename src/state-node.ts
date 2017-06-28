@@ -19,13 +19,14 @@ export class StateNode<T> extends BehaviorSubject<T> {
   }
 
   begin() {
-    let stateKeys = Object.keys(this.stateMap);
-    let orchestrators = stateKeys.map(key => new (this.stateMap[key])().scan(this.initialState[key], this.dispatcher));
+    let stateKeys: Array<string> = Object.keys(this.stateMap);
+    let init: { [stateKey: string]: any } = this.initialState;
+    let orchestrators = stateKeys.map(key => new (this.stateMap[key])().scan(init[key], this.dispatcher));
 
     Observable.zip
       .apply(this, orchestrators)
       .map((s: any) => {
-        let result = <T>{};
+        let result: any = <T>{};
         for (var i = 0; i < stateKeys.length; i++) {
           var key = stateKeys[i];
           result[key] = s[i];
